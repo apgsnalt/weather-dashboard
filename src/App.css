@@ -40,3 +40,10 @@
 .read-the-docs {
   color: #888;
 }
+
+.app-title {
+  color: var(--foreground);
+  font-size: clamp(1.25rem, 2.5vw, 2.2rem);
+  font-weight: 700;
+  line-height: 1;
+}

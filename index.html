@@ -5,6 +5,50 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>weather-dashboard</title>
+    <meta name="theme-color" id="meta-theme-color" content="#ffffff">
+    <script>
+      // Apply theme immediately to prevent flash. Also set inline background and text colors
+      (function() {
+        const stored = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = stored ? stored === 'dark' : prefersDark;
+
+        // Add class for Tailwind/css rules
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+
+        // Set inline colors to avoid white flash before CSS loads
+        // Pick simple, widely-supported hex fallbacks that match dark/light themes
+        const darkBg = '#0c0a0a'; // dark slate
+        const darkFg = '#0c0a0a';
+        const lightBg = '#ffffff';
+        const lightFg = '#0f172a';
+
+        const bg = isDark ? darkBg : lightBg;
+        const fg = isDark ? darkFg : lightFg;
+
+        try {
+          document.documentElement.style.backgroundColor = bg;
+          document.documentElement.style.color = fg;
+          // Ensure body and root match immediately
+          if (document.body) {
+            document.body.style.backgroundColor = bg;
+            document.body.style.color = fg;
+          }
+          const root = document.getElementById('root');
+          if (root) root.style.backgroundColor = bg;
+
+          // Update theme-color meta for mobile browser UI
+          const meta = document.getElementById('meta-theme-color');
+          if (meta) meta.setAttribute('content', bg);
+        } catch (e) {
+          // ignore
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
