@@ -2,9 +2,10 @@ import { useLayoutEffect, useState } from 'react'
 import './App.css'
 import { AsyncSelect } from './components/ui/async-select';
 import { ThemeToggle } from './components/ui/theme-toggle';
+import type { GeocodingCity, GeocodingMappedCity } from './types/open-weather';
 
 function App() {
-  const [value, setValue] = useState("");
+  const [cityId, setCityId] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const stored = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -24,12 +25,31 @@ function App() {
     setIsDarkMode(isDark);
   };
 
-  const fetchData = async (query?: string) => {
-    // Your async data fetch logic here
-    return [
-      { id: "1", name: "Example" },
-      { id: "2", name: "Another Example" }
-    ];
+  const fetchCity = async (query: string = '') => {
+    if (!query.trim().length) {
+      return [];
+    }
+
+    try {
+      const apiKey = import.meta.env.VITE_OPEN_WEATHER_API_KEY;
+      const response = await fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${query}&limit=5&appid=${apiKey}`);
+
+      if (!response.ok) {
+        console.error('OpenWeatherMap API error:', response.status);
+        return [];
+      }
+
+      const data = await response.json();
+      return data.map((city: GeocodingCity) => ({
+        id: `${city.lat},${city.lon}`,
+        name: [city.name, city.state, city.country].filter(Boolean).join(', '),
+        lat: city.lat,
+        lon: city.lon,
+      }));
+    } catch (error) {
+      console.error('Error fetching cities:', error);
+      return [];
+    }
   };
 
   return (
@@ -40,13 +60,14 @@ function App() {
       </div>
       <div className="p-4 mt-8">
         <AsyncSelect
-          fetcher={fetchData}
-          renderOption={(item) => <div>{item.name}</div>}
-          getOptionValue={(item) => item.id}
-          getDisplayValue={(item) => item.name}
-          label="Select"
-          value={value}
-          onChange={setValue}
+          fetcher={fetchCity}
+          renderOption={(item: GeocodingMappedCity) => <div>{item.name}</div>}
+          getOptionValue={(item: GeocodingMappedCity) => item.id}
+          getDisplayValue={(item: GeocodingMappedCity) => <div className='truncate'>{item.name}</div>}
+          label='City'
+          value={cityId}
+          onChange={setCityId}
+          width={300}
         />
       </div>
     </div>
