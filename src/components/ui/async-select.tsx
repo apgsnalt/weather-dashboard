@@ -178,6 +178,7 @@ export function AsyncSelect<T>({
           aria-expanded={open}
           className={cn(
             "justify-between",
+            "cursor-pointer",
             disabled && "opacity-50 cursor-not-allowed",
             triggerClassName
           )}

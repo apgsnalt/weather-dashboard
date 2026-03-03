@@ -28,6 +28,7 @@ export function ThemeToggle({ onThemeChange }: ThemeToggleProps) {
       variant="outline"
       size="icon"
       onClick={toggleTheme}
+      className="cursor-pointer"
       title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       {isDark ? (
