@@ -77,3 +77,7 @@ export interface ForecastResponse {
     sunset: number;
   };
 }
+
+interface WeatherDataWithPhase extends WeatherData {
+  dayPhase: string;
+}

@@ -2,13 +2,13 @@ import { useLayoutEffect, useState, useCallback, useEffect } from 'react'
 import './App.css'
 import { AsyncSelect } from './components/ui/async-select';
 import { ThemeToggle } from './components/ui/theme-toggle';
-import type { GeocodingCity, GeocodingMappedCity, ForecastResponse, WeatherData } from './types/open-weather';
+import type { GeocodingCity, GeocodingMappedCity, ForecastResponse, WeatherData, WeatherDataWithPhase } from './types/open-weather';
 
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import ForecastItem from './components/ForecastItem';
-import { ABSOLUTE_ZERO, API_BASE_URL } from './assets/const';
+import { ABSOLUTE_ZERO, API_BASE_URL, DAY_PHASES } from './assets/const';
 
 
 function App() {
@@ -23,6 +23,23 @@ function App() {
 
   const apiKey = import.meta.env.VITE_OPEN_WEATHER_API_KEY;
   const city = cities.find(c => c.id === cityId);
+
+  // Determine day phase for each forecast item
+  let dayPhaseForecast: Array<WeatherDataWithPhase> = [];
+  if (forecast) {
+    dayPhaseForecast = forecast.list
+    .filter((_, i) => i % 2 === 0)
+    .map((item: WeatherData) => {
+      const hour = new Date(item.dt * 1000).getHours();
+      const phaseHour = Math.floor(hour / 6) * 6;
+      const dayPhase = phaseHour.toString().padStart(2, '0') as DayPhases;
+      return {
+        ...item,
+        dayPhase: DAY_PHASES[dayPhase],
+      };
+    })
+  }
+
 
   useLayoutEffect(() => {
     const root = document.documentElement;
@@ -123,7 +140,7 @@ function App() {
           <div className="p-4">
             <h2 className="text-lg font-semibold mb-8">Forecast for {city?.name}</h2>
             <div className="grid grid-cols-1 gap-4">
-              {forecast.list.map((item: WeatherData) => (
+              {dayPhaseForecast.map((item: WeatherDataWithPhase) => (
                 <ForecastItem
                   key={item.dt}
                   id={item.dt}
@@ -131,6 +148,7 @@ function App() {
                     hour: '2-digit', 
                     minute: '2-digit' 
                   })}
+                  phase={item.dayPhase}
                   temperature={Math.round(item.main?.temp + ABSOLUTE_ZERO)}
                   description={item.weather?.[0].description ?? ''}
                 />
