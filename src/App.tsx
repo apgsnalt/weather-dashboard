@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import ForecastItem from './components/ForecastItem';
-import { ABSOLUTE_ZERO, API_BASE_URL, DAY_PHASES } from './assets/const';
+import { API_BASE_URL, DAY_PHASES } from './assets/const';
 
 
 function App() {
@@ -126,7 +126,7 @@ function App() {
             setCityId(value);
             setForecast(null);
           }}
-          width={300}
+          width={225}
         />
       </div>
 
@@ -143,14 +143,7 @@ function App() {
               {dayPhaseForecast.map((item: WeatherDataWithPhase) => (
                 <ForecastItem
                   key={item.dt}
-                  id={item.dt}
-                  time={new Date(item.dt * 1000).toLocaleTimeString([], { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                  })}
-                  phase={item.dayPhase}
-                  temperature={Math.round(item.main?.temp + ABSOLUTE_ZERO)}
-                  description={item.weather?.[0].description ?? ''}
+                  weatherData={item}
                 />
               ))}
             </div>
