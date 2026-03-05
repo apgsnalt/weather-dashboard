@@ -15,7 +15,6 @@ import { capitalCase } from 'change-case';
 
 const ForecastItem = ({ weatherData }: { weatherData: WeatherDataWithPhase}) => {
   const [ openDetail, setOpenDetail ] = useState(false);
-  console.log(weatherData);
 
   const time = new Date(weatherData.dt * 1000).toLocaleTimeString([], { 
     hour: '2-digit', 
